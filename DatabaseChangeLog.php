@@ -286,8 +286,9 @@ class DatabaseChangeLog
         }
 
         $query = $this->getConnection()->prepare($sql);
+        $result =$query->execute($data);
 
-        return $query->execute($data);
+        return $result;
     }
 
     /**
@@ -405,6 +406,54 @@ class DatabaseChangeLog
     }
 
     /**
+     * Quick check if need parse the sql query.
+     *
+     * @param $sql
+     * @return bool
+     */
+    private function isNeedParse($sql)
+    {
+        //check if this not a simple select
+        $mainActions =['DELETE','UPDATE','INSERT'];
+        $needParse = false;
+        foreach ($mainActions as $action){
+            if(stripos($sql,$action)!==false){
+                $needParse =true;
+                break;
+            }
+        }
+
+        if(!$needParse){
+            return false;
+        }
+
+
+        //check if in sql exist table/column from config
+        foreach ($this->logTablesConfig as $table=>$columnConfig){
+            if(strpos($sql,$table)!==false){//table exist in config
+                if($columnConfig=='all'){
+                    return true;
+                }
+                foreach ($columnConfig as $action => $columns){
+                    if(stripos($sql,$action)!==false){//action for table exists
+                        if($columns=='all'){
+                            return true;
+                        }
+
+                        foreach ($columns as $column){//column for table|action exist
+                            if(strpos($sql,$column)!==false){
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Log changes by sql query
      *
      * @param string $sql query to parse
@@ -413,13 +462,16 @@ class DatabaseChangeLog
     public function log($sql,$params = null)
     {
 
+        if(!$this->isNeedParse($sql)){
+            return;
+        }
+
         if($params){
             $sql = $this->interpolateQuery($sql,$params);
         }
 
         $parser = new \PHPSQLParser();
         $parsed = $parser->parse($sql);
-
 
         if(isset($parsed['DELETE'])){
             $this->logDelete($parsed);
