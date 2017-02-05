@@ -1,0 +1,20 @@
+CREATE TABLE `data_change_log` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `action` VARCHAR(50) NOT NULL,
+  `table` VARCHAR(100) NOT NULL,
+  `column` VARCHAR(100) NOT NULL,
+  `newValue` LONGTEXT NULL DEFAULT NULL,
+  `oldValue` LONGTEXT NULL DEFAULT NULL,
+  `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `system` VARCHAR(50) NOT NULL,
+  `columnReference` VARCHAR(100) NULL DEFAULT NULL,
+  `operatorReference` VARCHAR(50) NULL DEFAULT NULL,
+  `valueReference` VARCHAR(50) NULL DEFAULT NULL,
+  `userId` INT UNSIGNED NOT NULL,
+  `ip` VARCHAR(50) NOT NULL,
+  `userAgent` TEXT NOT NULL,
+  PRIMARY KEY (`id`)
+)
+  COLLATE='utf8mb4_general_ci'
+  ENGINE=InnoDB
+;

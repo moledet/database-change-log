@@ -1,0 +1,35 @@
+{
+  "name": "moledet/database-change-log",
+  "description" : "A PHP class to log all changes of table data from raw SQL or with PDO statement",
+  "license": "MIT",
+  "keywords": [
+    "php", "database", "log", "column", "table", "sql"
+  ],
+  "authors": [
+    {
+      "name": "moledet",
+      "email": "moledet@ukr.net",
+      "role": "Developer"
+    }
+  ],
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/moledet/.git"
+    }
+  ],
+  "require": {
+    "php": ">=5.3",
+    "greenlion/php-sql-parser": "*"
+  },
+  "autoload": {
+    "psr-0" : {
+      "Log\\DatabaseChangeLog" : "/"
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0"
+    }
+  }
+}
