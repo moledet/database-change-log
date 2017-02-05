@@ -89,3 +89,15 @@ Or PDO:
     $stmt->execute([$bonus,$id]);
  }
 ``` 
+
+
+###Result
+In table _data_change_log_ will be save the log of changes.
+
+| id | action  | table  | column | newValue | oldValue | date | system | userId | ip | UserAgent | columnReference | operatorReference | valueReference|
+| --- |:-------------:| -----:| -----:| :-------------:| ------:| -----:|:-------------:| -----:| -----:|:-------------:| -----:| -----:| -----:|
+| 1 | update | customers| phone| 77777| 99999|  2017-02-02 10:33:32| CRM| 5| 127.0.0.1|Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36|id|=|289460|
+| 2 | delete | country| | null|null| 2017-02-03 11:33:22|API|1|127.1.1.7|Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36|countryId|=|20|
+| 3 | insert | user | name | Bob |null| 2017-02-04 15:31:52|API|1|127.1.1.7|Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36|null|null|null|
+| 5 | insert | user | phone | 89898 |null| 2017-02-04 15:31:52|API|1|127.1.1.7|Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36|null|null|null| 
+| 6 | insert | user | password | secret |null| 2017-02-04 15:31:52|API|1|127.1.1.7|Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36|null|null|null|  
