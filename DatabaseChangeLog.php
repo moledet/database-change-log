@@ -48,6 +48,7 @@ class DatabaseChangeLog
     private $connection = null;
 
     private $connectionString = null;
+    private $ip = null;
 
     private function __construct() { /* ... @return Singleton */ }
     private function __clone() { /* ... @return Singleton */ }
@@ -70,6 +71,23 @@ class DatabaseChangeLog
     {
         return $this->userId;
     }
+
+    /**
+     * @return string
+     */
+    public function getIp()
+    {
+        return $this->ip;
+    }
+
+    /**
+     * @param string $ip
+     */
+    public function setIp($ip)
+    {
+        $this->ip = $ip;
+    }
+
 
     /**
      * @return array
@@ -140,6 +158,10 @@ class DatabaseChangeLog
      */
     public function getUserIP() {
 
+        if(!empty($this->getIp())){
+            return $this->getIp();
+        }
+
         if (isset($_SERVER['HTTP_CLIENT_IP']))
             $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
         else if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
@@ -156,6 +178,9 @@ class DatabaseChangeLog
             $ipaddress = $_SERVER['REMOTE_ADDR'];
         else
             $ipaddress = 'UNKNOWN';
+
+        $this->setIp($ipaddress);
+
         return $ipaddress;
     }
 
@@ -252,9 +277,10 @@ class DatabaseChangeLog
      * Save log data to database.
      *
      * @param array $data [action,table,column,newValue,columnReference,operatorReference,valueReference, userId, ip, userAgent]
+     * @param int $groupId id of group request
      * @return bool status
      */
-    private function saveLog($data)
+    private function saveLog($data, $groupId = 0)
     {
 
         if(!$this->checkTableConfig($data)){
@@ -268,19 +294,19 @@ class DatabaseChangeLog
                              WHERE {$data['table']}.{$data['columnReference']}  {$data['operatorReference']}  '{$data['valueReference']}' 
                              LIMIT 1";//prevent errors on multi were conditions TODO: use mysql:GROUP_CONCAT or pgsql:array_to_string(array_agg(column), ',')
 
-                 $sql = "INSERT INTO data_change_log (data_change_log.action,data_change_log.table,data_change_log.column,newValue,columnReference,operatorReference,valueReference,userId,ip,userAgent, system, oldValue) ".
-                        "VALUES                      (:action,:table,:column,:newValue,:columnReference,:operatorReference,:valueReference,:userId,:ip,:userAgent,'{$this->getSystemName()}',($subQuery));";
+                 $sql = "INSERT INTO data_change_log (data_change_log.action,data_change_log.table,data_change_log.column,newValue,columnReference,operatorReference,valueReference,userId,ip,userAgent, system, oldValue,groupId) ".
+                        "VALUES                      (:action,:table,:column,:newValue,:columnReference,:operatorReference,:valueReference,:userId,:ip,:userAgent,'{$this->getSystemName()}',($subQuery),$groupId);";
 
                 break;
             case 'delete':
-                $sql = "INSERT INTO data_change_log (data_change_log.action,data_change_log.table,columnReference,operatorReference,valueReference,userId,ip,userAgent, system) ".
-                       "VALUES                      (:action,:table,:columnReference,:operatorReference,:valueReference,:userId,:ip,:userAgent,'{$this->getSystemName()}');";
+                $sql = "INSERT INTO data_change_log (data_change_log.action,data_change_log.table,columnReference,operatorReference,valueReference,userId,ip,userAgent, system,groupId) ".
+                       "VALUES                      (:action,:table,:columnReference,:operatorReference,:valueReference,:userId,:ip,:userAgent,'{$this->getSystemName()}',$groupId);";
 
                 break;
             case 'insert':
 
-                $sql = "INSERT INTO data_change_log (data_change_log.action,data_change_log.table,data_change_log.column,newValue,userId,ip,userAgent, system) ".
-                        "VALUES                     (:action,:table,:column,:newValue,:userId,:ip,:userAgent,'{$this->getSystemName()}');";
+                $sql = "INSERT INTO data_change_log (data_change_log.action,data_change_log.table,data_change_log.column,newValue,userId,ip,userAgent, system,groupId) ".
+                        "VALUES                     (:action,:table,:column,:newValue,:userId,:ip,:userAgent,'{$this->getSystemName()}',$groupId);";
 
                 break;
         }
@@ -288,7 +314,14 @@ class DatabaseChangeLog
         $query = $this->getConnection()->prepare($sql);
         $result =$query->execute($data);
 
-        return $result;
+        if($result && ($groupId==0)){
+            $lastInsertId =  $this->getConnection()->lastInsertId();
+            $sql = "UPDATE data_change_log SET groupId = :lastInsertId WHERE id = :lastInsertId;";
+            $this->getConnection()->prepare($sql)->execute(['lastInsertId'=>$lastInsertId]);
+            $groupId = $lastInsertId;
+        }
+
+        return $groupId;
     }
 
     /**
@@ -338,13 +371,15 @@ class DatabaseChangeLog
      * @param $column
      * @param $value
      * @param $logData
+     * @param $groupId
+     * @return int groupId
      */
-    private function logValueInsert($column,$value,$logData)
+    private function logValueInsert($column,$value,$logData,$groupId=0)
     {
         $logData['column'] = $column['base_expr'];
         $logData['newValue'] = $value['base_expr'];
 
-        $this->saveLog($logData);
+        return $this->saveLog($logData,$groupId);
     }
 
     /**
@@ -359,8 +394,9 @@ class DatabaseChangeLog
 
         $logData['table'] = $parsed['INSERT'][0]['table'];
 
+        $groupId = 0;
         foreach ($parsed['INSERT'][0]['columns'] as $num => $column){
-            $this->logValueInsert($column,$parsed['VALUES'][0]['data'][$num],$logData);
+           $groupId = $this->logValueInsert($column,$parsed['VALUES'][0]['data'][$num],$logData,$groupId);
         }
 
     }
@@ -461,7 +497,6 @@ class DatabaseChangeLog
      */
     public function log($sql,$params = null)
     {
-
         if(!$this->isNeedParse($sql)){
             return;
         }
