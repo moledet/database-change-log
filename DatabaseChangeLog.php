@@ -332,8 +332,21 @@ class DatabaseChangeLog
      */
     private function logValueUpdate($value,$logData)
     {
+
         $logData['column'] = $value['sub_tree'][0]['base_expr'];
-        $logData['newValue'] = $value['sub_tree'][2]['base_expr'];
+        $logData['newValue'] ='';
+
+        foreach (array_slice($value['sub_tree'],1) as $expr){
+
+            if($expr['expr_type']=='colref'){
+                $logData['newValue'] .= $expr['base_expr'].' ';
+            }
+
+            if($expr['expr_type']=='const'){
+                $logData['newValue'] .= trim($expr['base_expr'],"'").' ';
+            }
+        }
+        $logData['newValue'] = rtrim( $logData['newValue']);
 
         $this->saveLog($logData);
     }
@@ -432,8 +445,10 @@ class DatabaseChangeLog
             if (is_null($value))
                 $values[$key] = 'NULL';
 
-            if ($value instanceof \DateTime)
-                $values[$key] = $value->format('YYYY-MM-DD HH:MM:SS');
+            if ($value instanceof \DateTime){
+                $values[$key] =  "'". $value->format('Y-m-d H:i:s')."'";
+            }
+
         }
 
         $query = preg_replace($keys, $values, $query, 1, $count);
