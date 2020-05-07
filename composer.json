@@ -24,12 +24,12 @@
   },
   "autoload": {
     "psr-0" : {
-      "Log\\DatabaseChangeLog" : "/"
+      "Log\\" : "/"
     }
   },
   "extra": {
     "branch-alias": {
-      "dev-master": "1.0"
+      "dev-master": "1.0.1"
     }
   }
 }
