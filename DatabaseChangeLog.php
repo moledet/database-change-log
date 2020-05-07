@@ -9,7 +9,7 @@
  */
 
 
-namespace Log;
+namespace DatabaseChangeLog;
 
 /**
  * Class DatabaseChangeLog
