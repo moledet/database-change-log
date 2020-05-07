@@ -405,11 +405,11 @@ class DatabaseChangeLog
         $logData = $this->getUserData();
         $logData['action'] = 'insert';
 
-        $logData['table'] = $parsed['INSERT'][0]['table'];
+        $logData['table'] = $parsed['INSERT'][1]['table'];
 
         $groupId = 0;
-        foreach ($parsed['INSERT'][0]['columns'] as $num => $column){
-           $groupId = $this->logValueInsert($column,$parsed['VALUES'][0]['data'][$num],$logData,$groupId);
+        foreach ($parsed['INSERT'][2]['sub_tree'] as $num => $column){
+            $groupId = $this->logValueInsert($column,$parsed['VALUES'][0]['data'][$num],$logData,$groupId);
         }
 
     }
