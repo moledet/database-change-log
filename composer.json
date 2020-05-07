@@ -23,7 +23,7 @@
     "greenlion/php-sql-parser": "*"
   },
   "autoload": {
-    "psr-0" : {
+    "psr-4" : {
       "DatabaseChangeLog\\" : "/"
     }
   },
