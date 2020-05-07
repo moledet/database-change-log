@@ -28,7 +28,7 @@ or add to yours _composer.json_ see [the documentation](https://getcomposer.org/
          }
      ],
      "require": {
-         "moledet/database-change-log": "*"
+         "moledet/database-change-log": "dev-master"
      }
  }
 ```
