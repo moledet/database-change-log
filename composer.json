@@ -20,11 +20,11 @@
   ],
   "require": {
     "php": ">=5.3",
-    "greenlion/php-sql-parser": "*"
+    "greenlion/php-sql-parser": "4.3.0"
   },
   "autoload": {
-    "psr-0" : {
-      "Log\\" : "/"
+    "psr-4" : {
+      "DatabaseChangeLog\\" : "/"
     }
   },
   "extra": {
