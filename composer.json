@@ -20,7 +20,7 @@
   ],
   "require": {
     "php": ">=5.3",
-    "greenlion/php-sql-parser": "4.1.1"
+    "greenlion/php-sql-parser": "4.3.0"
   },
   "autoload": {
     "psr-4" : {
