@@ -11,8 +11,6 @@
 
 namespace Log;
 
-require_once __DIR__.'/../PHP-SQL-Parser/src/PHPSQLParser.php';
-
 /**
  * Class DatabaseChangeLog
  * Log change of tables[columns] from config into database connection.
@@ -520,7 +518,7 @@ class DatabaseChangeLog
             $sql = $this->interpolateQuery($sql,$params);
         }
 
-        $parser = new \PHPSQLParser();
+        $parser = new PHPSQLParser\PHPSQLParser();
         $parsed = $parser->parse($sql);
 
         if(isset($parsed['DELETE'])){
