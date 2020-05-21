@@ -437,9 +437,6 @@ class DatabaseChangeLog
             }
 
             switch ($value) {
-                case $value instanceof \DateTime:
-                    $values[$key] =  "'". $value->format('Y-m-d H:i:s')."'";
-                    break;
                 case is_string($value):
                     if (is_numeric($value)) {
                         $values[$key] = $value;
@@ -461,6 +458,10 @@ class DatabaseChangeLog
                 case is_null($value):
                     $values[$key] = 'NULL';
                     break;
+            }
+
+            if ($value instanceof \DateTime) {
+                    $values[$key] =  "'". $value->format('Y-m-d H:i:s')."'";
             }
 
         }
