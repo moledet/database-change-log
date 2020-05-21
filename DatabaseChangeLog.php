@@ -444,6 +444,7 @@ class DatabaseChangeLog
                     if (is_numeric($value)) {
                         $values[$key] = $value;
                     } else {
+                        $value = stristr($value, "?") !== false ? str_replace('?', '%3F', $value) : $value;
                         if ($value[0] !== "'" || $value[0] !== '"') {
                             $values[$key] = "'{$value}'";
                         } else {
@@ -465,6 +466,7 @@ class DatabaseChangeLog
         }
 
         $query = preg_replace($keys, $values, $query, 1, $count);
+        $query = stristr($query, "%3F") !== false ? str_replace('%3F', '?', $query) : $query;
 
         return $query;
     }
