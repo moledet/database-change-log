@@ -436,17 +436,30 @@ class DatabaseChangeLog
                 $keys[] = '/[?]/';
             }
 
-            if (is_string($value))
-                $values[$key] =$value;
-
-            if (is_array($value))
-                $values[$key] = implode("','", $value);
-
-            if (is_null($value))
-                $values[$key] = 'NULL';
-
-            if ($value instanceof \DateTime){
-                $values[$key] =  "'". $value->format('Y-m-d H:i:s')."'";
+            switch ($value) {
+                case $value instanceof \DateTime:
+                    $values[$key] =  "'". $value->format('Y-m-d H:i:s')."'";
+                    break;
+                case is_string($value):
+                    if (is_numeric($value)) {
+                        $values[$key] = $value;
+                    } else {
+                        if ($value[0] !== "'" || $value[0] !== '"') {
+                            $values[$key] = "'{$value}''";
+                        } else {
+                            $values[$key] = $value;
+                        }
+                    }
+                    break;
+                case is_int($value) || is_float($value):
+                    $values[$key] = $value;
+                    break;
+                case is_array($value):
+                    $values[$key] = implode("','", $value);
+                    break;
+                case is_null($value):
+                    $values[$key] = 'NULL';
+                    break;
             }
 
         }
