@@ -445,7 +445,7 @@ class DatabaseChangeLog
                         $values[$key] = $value;
                     } else {
                         if ($value[0] !== "'" || $value[0] !== '"') {
-                            $values[$key] = "'{$value}''";
+                            $values[$key] = "'{$value}'";
                         } else {
                             $values[$key] = $value;
                         }
