@@ -436,22 +436,38 @@ class DatabaseChangeLog
                 $keys[] = '/[?]/';
             }
 
-            if (is_string($value))
-                $values[$key] =$value;
+            switch ($value) {
+                case is_string($value):
+                    if (is_numeric($value)) {
+                        $values[$key] = $value;
+                    } else {
+                        $value = stristr($value, "?") !== false ? str_replace('?', '%3F', $value) : $value;
+                        if ($value[0] !== "'" || $value[0] !== '"') {
+                            $values[$key] = "'{$value}'";
+                        } else {
+                            $values[$key] = $value;
+                        }
+                    }
+                    break;
+                case is_int($value) || is_float($value):
+                    $values[$key] = $value;
+                    break;
+                case is_array($value):
+                    $values[$key] = implode("','", $value);
+                    break;
+                case is_null($value):
+                    $values[$key] = 'NULL';
+                    break;
+            }
 
-            if (is_array($value))
-                $values[$key] = implode("','", $value);
-
-            if (is_null($value))
-                $values[$key] = 'NULL';
-
-            if ($value instanceof \DateTime){
-                $values[$key] =  "'". $value->format('Y-m-d H:i:s')."'";
+            if ($value instanceof \DateTime) {
+                    $values[$key] =  "'". $value->format('Y-m-d H:i:s')."'";
             }
 
         }
 
         $query = preg_replace($keys, $values, $query, 1, $count);
+        $query = stristr($query, "%3F") !== false ? str_replace('%3F', '?', $query) : $query;
 
         return $query;
     }
