@@ -52,7 +52,7 @@ class DatabaseChangeLog
 
     private function __construct() { /* ... @return Singleton */ }
     private function __clone() { /* ... @return Singleton */ }
-    private function __wakeup() { /* ... @return Singleton */ }
+    public function __wakeup() { /* ... @return Singleton */ }
 
     static public function getInstance()
     {
