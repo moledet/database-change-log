@@ -15,7 +15,7 @@
   "repositories": [
     {
       "type": "vcs",
-      "url": "https://github.com/moledet/.git"
+      "url": "https://github.com/moledet/database-change-log"
     }
   ],
   "require": {
