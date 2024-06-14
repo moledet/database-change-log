@@ -23,8 +23,8 @@ or add to yours _composer.json_ see [the documentation](https://getcomposer.org/
  {
      "repositories": [
          {
-             "url": "https://github.com/moledet/database-change-log.git",
-             "type": "git"
+             "url": "https://github.com/moledet/database-change-log",
+             "type": "vcs"
          }
      ],
      "require": {
