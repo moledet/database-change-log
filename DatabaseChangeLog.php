@@ -294,19 +294,19 @@ class DatabaseChangeLog
                              WHERE {$data['table']}.{$data['columnReference']}  {$data['operatorReference']}  '{$data['valueReference']}' 
                              LIMIT 1";//prevent errors on multi were conditions TODO: use mysql:GROUP_CONCAT or pgsql:array_to_string(array_agg(column), ',')
 
-                 $sql = "INSERT INTO data_change_log (data_change_log.action,data_change_log.table,data_change_log.column,newValue,columnReference,operatorReference,valueReference,userId,ip,userAgent, system, oldValue,groupId) ".
-                        "VALUES                      (:action,:table,:column,:newValue,:columnReference,:operatorReference,:valueReference,:userId,:ip,:userAgent,'{$this->getSystemName()}',($subQuery),$groupId);";
+                $sql = "INSERT INTO data_change_log (data_change_log.action,data_change_log.table,data_change_log.column,newValue,columnReference,operatorReference,valueReference,userId,ip,userAgent, data_change_log.system, oldValue,groupId) ".
+                    "VALUES                      (:action,:table,:column,:newValue,:columnReference,:operatorReference,:valueReference,:userId,:ip,:userAgent,'{$this->getSystemName()}',($subQuery),$groupId);";
 
                 break;
             case 'delete':
-                $sql = "INSERT INTO data_change_log (data_change_log.action,data_change_log.table,columnReference,operatorReference,valueReference,userId,ip,userAgent, system,groupId) ".
-                       "VALUES                      (:action,:table,:columnReference,:operatorReference,:valueReference,:userId,:ip,:userAgent,'{$this->getSystemName()}',$groupId);";
+                $sql = "INSERT INTO data_change_log (data_change_log.action,data_change_log.table,columnReference,operatorReference,valueReference,userId,ip,userAgent, data_change_log.system,groupId) ".
+                    "VALUES                      (:action,:table,:columnReference,:operatorReference,:valueReference,:userId,:ip,:userAgent,'{$this->getSystemName()}',$groupId);";
 
                 break;
             case 'insert':
 
-                $sql = "INSERT INTO data_change_log (data_change_log.action,data_change_log.table,data_change_log.column,newValue,userId,ip,userAgent, system,groupId) ".
-                        "VALUES                     (:action,:table,:column,:newValue,:userId,:ip,:userAgent,'{$this->getSystemName()}',$groupId);";
+                $sql = "INSERT INTO data_change_log (data_change_log.action,data_change_log.table,data_change_log.column,newValue,userId,ip,userAgent, data_change_log.system,groupId) ".
+                    "VALUES                     (:action,:table,:column,:newValue,:userId,:ip,:userAgent,'{$this->getSystemName()}',$groupId);";
 
                 break;
         }
